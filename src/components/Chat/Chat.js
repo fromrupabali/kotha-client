@@ -69,7 +69,6 @@ const Location = styled.p`
 const MessageCanvas = styled.div`
    width: 100%;
    height 70%;
-   background: purple;
    overflow-y: scroll;
    
 `
@@ -77,7 +76,7 @@ const Messages = styled.div`
    width: 90%;
    height: 100%;
    padding: 5%;
-   background: yellow;
+  
 `
 const MessageBox = styled.div`
    width: 100%;

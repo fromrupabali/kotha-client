@@ -18,7 +18,6 @@ const User = styled.div`
 const ImageContainer = styled.div`
    width: 60px;
    height: 60px;
-   background: red;
    float: left;
    margin: 10px 0 0 10px;
 `
