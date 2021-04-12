@@ -13,7 +13,7 @@ const SignContainer = styled.div`
    height: auto;
    padding: 2% 3%;
    background: white;
-   margin: 50px 0 0 32%;
+   margin: 50px 0 0 34%;
    border-radius: 5px;
    text-align: center;
 `
