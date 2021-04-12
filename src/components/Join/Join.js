@@ -108,7 +108,7 @@ function SignIn() {
             );
             if(user.data.data.signIn.success){
                 localStorage.setItem('TOKEN', user.data.data.signIn.token);
-                localStorage.setItem('userId', user.data.data.signUp.userId);
+                localStorage.setItem('userId', user.data.data.signIn.userId);
                 setRedirect(<Redirect to="/chat"/>);
             }else{
                 setMessage(user.data.data.signIn.error_message);
