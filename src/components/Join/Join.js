@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-// import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Redirect } from "react-router-dom";
+import axios from 'axios';
 
 import Navigation from '../Navigation/Navigation';
+import { serverUrl } from '../../utils';
+import Spinner from '../Modals/Spinner';
 
 import styled from 'styled-components';
 
@@ -27,7 +30,7 @@ const Input = styled.input`
    padding: 15px 5%;
    border: 1px solid #eee;
    outline: none;
-   font-size: 15px;
+   font-size: 18px;
 `
 const Button = styled.button`
    padding: 13px 50px;
@@ -56,43 +59,146 @@ const SwitchButton = styled.button`
 
 function SignIn() {
   let content;
-  // const [name, setName] = useState('');
-  // const [room, setRoom] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [spinner, setSpinner] = useState(false);
+  const [message, setMessage] = useState('');
+  const [redirect, setRedirect] = useState(null);
+
   const [sign, setSign] = useState(true);
+
+  const switchHandler = ()=>{
+       setSign(!sign);
+       setName('');
+       setEmail('');
+       setPassword('');
+       setMessage('');
+  }
+  const emailChangeHandler = (e) =>{
+    setEmail(e.target.value);
+  }
+  const passwordChangeHandler = (e) =>{
+    setPassword(e.target.value);
+  }
+  const nameChangeHandler = (e) =>{
+    setName(e.target.value);
+  }
+  const signInHandler = async() =>{
+    try {
+        if(email && password){
+            setMessage('');
+            setSpinner(true);
+            const user = await axios.post(
+                serverUrl,
+                {
+                    query:`
+                       query{
+                           signIn(email:"${email}", password:"${password}"){
+                               success
+                               token
+                               userId
+                               error_message
+                               success
+                           }
+                       }
+                    `
+                }
+
+            );
+            if(user.data.data.signIn.success){
+                localStorage.setItem('TOKEN', user.data.data.signIn.token);
+                localStorage.setItem('userId', user.data.data.signUp.userId);
+                setRedirect(<Redirect to="/chat"/>);
+            }else{
+                setMessage(user.data.data.signIn.error_message);
+            }
+            setSpinner(false);
+            console.log(user);
+        }
+    } catch (error) {
+        throw error;
+    }
+};
+const signUpHandler = async() =>{
+  try {
+      if(email && password){
+          setMessage('');
+          setSpinner(true);
+          const user = await axios.post(
+              serverUrl,
+              {
+                  query:`
+                     mutation{
+                         signUp(email:"${email}", password:"${password}", userName:"${name}"){
+                             success
+                             token
+                             userId
+                             error_message
+                             success
+                         }
+                     }
+                  `
+              }
+
+          );
+          if(user.data.data.signUp.success){
+              localStorage.setItem('TOKEN', user.data.data.signUp.token);
+              localStorage.setItem('userId', user.data.data.signUp.userId);
+              setRedirect(<Redirect to="/chat"/>);
+          }else{
+              setMessage(user.data.data.signUp.error_message);
+          }
+          setSpinner(false);
+          console.log(user);
+          }
+  } catch (error) {
+      throw error;
+  }
+};
+ useEffect(()=>{
+   if(localStorage.TOKEN){
+     setRedirect(<Redirect to="/chat" />)
+   }
+ },[]);
   if(sign){
      content = <SignContainer>
               <Title>Sign in</Title>
               <InputBox>
-                  <Input type="email" placeholder="Email"/>
+                  <Input onChange={emailChangeHandler} value={email} type="email" placeholder="Email"/>
               </InputBox>
               <InputBox>
-                  <Input type="password" placeholder="Password"/>
+                  <Input onChange={passwordChangeHandler} value={password} type="password" placeholder="Password"/>
               </InputBox>
+              <p style={{color: "red"}}>{message}</p>
               <InputBox>
-                  <Button>Sign in</Button>
+                  <Button onClick={signInHandler}>Sign in</Button>
               </InputBox>
-              <p >Haven't Account ? <SwitchButton onClick={()=>{setSign(false)}}>Join</SwitchButton></p>
+              <p >Haven't Account ? <SwitchButton onClick={switchHandler}>Join</SwitchButton></p>
           </SignContainer>
    }else{
      content = <SignContainer>
               <Title>Join</Title>
               <InputBox>
-                  <Input type="text" placeholder="User name"/>
+                  <Input onChange={nameChangeHandler} value={name} type="text" placeholder="User name"/>
               </InputBox>
               <InputBox>
-                  <Input type="email" placeholder="Email"/>
+                  <Input onChange={emailChangeHandler} value={email} type="email" placeholder="Email"/>
               </InputBox>
               <InputBox>
-                  <Input type="password" placeholder="Password"/>
+                  <Input onChange={passwordChangeHandler} value={password} type="password" placeholder="Password"/>
               </InputBox>
+              <p style={{color: "red"}}>{message}</p>
               <InputBox>
-                  <Button>Join</Button>
+                  <Button onClick={signUpHandler}>Join</Button>
               </InputBox>
-              <p>Already have an account ? <SwitchButton onClick={()=>{setSign(true)}}>Sign in</SwitchButton></p>
+              <p>Already have an account ? <SwitchButton onClick={switchHandler}>Sign in</SwitchButton></p>
             </SignContainer>
    }
   return (
     <div>
+        {redirect}
+        <Spinner show={spinner}/>
         <Navigation />
         {content}
     </div>

@@ -1,7 +1,6 @@
 import React from 'react';
 
-
-
+import Avatar from '../../assets/avatar.svg';
 import styled from 'styled-components';
 
 const User = styled.div`
@@ -45,13 +44,19 @@ const Location = styled.p`
     color: gray;
 `
 const user = (props) =>{
+    let userName;
+    if(props.user.userName){
+        userName = <Title>{props.user.userName}</Title>
+    }else{
+         userName = <Title>Unknown</Title>
+    }
     return(
-      <User> 
+      <User onClick={()=>{props.roomHandler(props.id)}}> 
           <ImageContainer>
-              <Image src="https://www.cricfrenzy.com/imagestorages/app/2020-11/cricfrenzy1606584091Virat-Kohli.jpg" alt="user"/>
+              <Image src={Avatar} alt="user"/>
           </ImageContainer>
           <UserDetails>
-              <Title>Virat Kohli</Title>
+              {userName}
               <Location>Dhaka, Bangladesh</Location>
           </UserDetails>
       </User>
